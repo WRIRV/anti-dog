@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Антисобачка</title>
+    <link href="media/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="style.css" rel="stylesheet">
+    <script src="functions.js" defer></script>
+    <script src="task_data.js" defer></script>
+    <script src="main.js" defer></script>
+</head>
+
+<body>
+    
+    <h1>Дешифратор тематических задач по информатике</h1>
+
+    <main>
+
+        <div class="theme-selecting">
+            <fieldset>
+
+                <legend>
+                    <p>Типы задач</p>
+                </legend>
+
+                <ul>
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="1" disabled>
+                        <p>Обработка текстовой информации</p>
+                    </li>
+
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="2" disabled>
+                        <p>Обработка графической информации</p>
+                    </li>
+
+                    <li>
+                        <input class="task-theme" type="radio" name="task" value="3">
+                        <p>Обработка звуковой информации</p>
+                    </li>
+
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="4" disabled>
+                        <p>Системы счисления</p>
+                    </li>
+
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="5" disabled>
+                        <p>Передача информации</p>
+                    </li>
+
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="6" disabled>
+                        <p>Преобразование логических выражений</p>
+                    </li>
+
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="7" disabled>
+                        <p>Кодирование информации</p>
+                    </li>
+
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="8" disabled>
+                        <p>Языки программирования</p>
+                    </li>
+
+                    <li class="disabled">
+                        <input class="task-theme" type="radio" name="task" value="9" disabled>
+                        <p>Задачи ЕГЭ</p>
+                    </li>
+                </ul>
+
+            </fieldset>
+
+            <button id="select-theme-button" type="button">Выбрать тему</button>
+        </div>
+
+
+
+        <div class="type-selecting deleted">
+
+            <button class="back-button" type="button"><-Назад</button>
+
+            <select id="task-types">
+                <option value="" disabled selected>Выбери тип задач</option>
+            </select>
+
+            <button id="select-type-button" type="button">Выбрать тип задачи</button>
+
+        </div>
+
+
+
+        <div class="task-completing deleted">
+
+            <button class="back-button" type="button"><-Назад</button>
+
+            <div class="answer-field">
+                <p id="answer"></p>
+                <button id="get-answer-button" type="button">Получить ответ</button>
+            </div>
+
+        </div>
+
+        
+
+        <img src="media/dog.png">
+
+    </main>
+
+
+
+    <footer>
+
+        <p>Данный расшифратор подходит для версии 3.2.6 и не рассчитан для более новых, возможны редкие ошибки в ответах</p>
+
+    </footer>
+
+</body>
+
+</html>
