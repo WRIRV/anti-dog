@@ -165,7 +165,7 @@ const taskFunctional = {
             'generateInterface': () => {
                 //
                 const warning = document.createElement('p');
-                warning.innerHTML = 'БОЛЬШОЙ ШАНС НЕПРАВИЛЬНОГО ОТВЕТА! ПРОВЕРЯЙТЕ ВЫВЕДЕННОЕ ЗНАЧЕНИЕ!';
+                warning.innerHTML = 'БОЛЬШОЙ ШАНС НЕПРАВИЛЬНОГО ОТВЕТА (~40%)! ПРОВЕРЯЙТЕ ВЫВЕДЕННОЕ ЗНАЧЕНИЕ!';
                 warning.classList.add('generated-interface');
                 warning.style.color = 'red';
                 taskCompletingDiv.insertBefore(warning, answerFieldDiv);
@@ -354,4 +354,5 @@ const taskFunctional = {
     7: {},
     8: {},
     9: {}
+
 };
