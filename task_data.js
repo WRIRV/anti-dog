@@ -1,24 +1,23 @@
 const taskThemes = {
-    1: [],
-    2: [],
+    1: {},
+    2: {},
     3: {
         1: 'Найти время одной записи',
         2: 'Во сколько раз первая запись больше второй'
     },
-    4: [],
-    5: [],
-    6: [],
-    7: [],
-    8: [],
-    9: {
-        1: 'lox',
-        2: 'zov',
-        3: 'piz',
-        4: 'ahahahah'
-    }
+    4: {},
+    5: {},
+    6: {
+        1: 'Логические выражения'
+    },
+    7: {},
+    8: {},
+    9: {}
 };
 
 const taskFunctional = {
+    1: {},
+    2: {},
     3: {
         1: {
             'generateInterface': () => {
@@ -129,7 +128,7 @@ const taskFunctional = {
 
                 isFEquals.addEventListener('change', function(){
                     const fObjects = document.querySelectorAll('.f');
-                    if(isFEquals.checked){
+                    if(this.checked){
                         for(let object of fObjects) object.style.display = 'none';
                         selectRound.value = 2;
                     }
@@ -159,4 +158,200 @@ const taskFunctional = {
             }
         }
     },
+    4: {},
+    5: {},
+    6: {
+        1:{
+            'generateInterface': () => {
+                //
+                const warning = document.createElement('p');
+                warning.innerHTML = 'БОЛЬШОЙ ШАНС НЕПРАВИЛЬНОГО ОТВЕТА! ПРОВЕРЯЙТЕ ВЫВЕДЕННОЕ ЗНАЧЕНИЕ!';
+                warning.classList.add('generated-interface');
+                warning.style.color = 'red';
+                taskCompletingDiv.insertBefore(warning, answerFieldDiv);
+
+                const iscoefficient = createInput({type: 'checkbox', class: 'coefficient'});
+                const coefDesc = document.createElement('p').innerHTML = 'Коэффициенты X (оставить поле пустым, если его нет, т.е. равен 1)';
+                const divCoef = createGroupingDiv({}, [iscoefficient, coefDesc]);
+                taskCompletingDiv.insertBefore(divCoef, answerFieldDiv);
+
+                const answerType = createSelect({class: 'answer-type'}, {
+                    'max': 'наибольшее целое число X',
+                    'min': 'наименьшее целое число X',
+                    'summ': 'сумму целых чисел X',
+                    'amount': 'количество целых чисел X'
+                });
+                const divAnswerType = createGroupingDiv({title: 'Тип ответа:'}, [answerType]);
+                taskCompletingDiv.insertBefore(divAnswerType, answerFieldDiv);
+
+                const coefX1 = createInput({type: 'number', class: 'coef-x1', width: '30px'});
+                coefX1.classList.add('coef');
+                coefX1.style.display = 'none';
+
+                const textX1 = document.createElement('p').innerHTML = 'X';
+                const x1Operator = createSelect({class: 'x1-operator'}, {
+                    '<': '<',
+                    '>': '>',
+                    '>=': '>=',
+                    '<=': '<='
+                });
+                const x1 = createInput({type: 'number', class: 'x1-input', width: '40px'});
+                const divX1 = createGroupingDiv({title: '1 выражение:'}, [coefX1, textX1, x1Operator, x1]);
+                taskCompletingDiv.insertBefore(divX1, answerFieldDiv);
+
+                const x1_x2_Operator = createSelect({class: 'x1-x2-operator'}, {
+                    '=>': '=>',
+                    'V': 'V'
+                });
+                const divX1X2 = createGroupingDiv({title: 'Знак между 1 и 2 выражениями:'}, [x1_x2_Operator]);
+                taskCompletingDiv.insertBefore(divX1X2, answerFieldDiv);
+
+                const coefX2 = createInput({type: 'number', class: 'coef-x2', width: '30px'});
+                coefX2.classList.add('coef');
+                coefX2.style.display = 'none';
+
+                const textX2 = textX1;
+                const x2Operator = createSelect({class: 'x2-operator'}, {
+                    '<': '<',
+                    '>': '>',
+                    '>=': '>=',
+                    '<=': '<='
+                });
+                const x2 = createInput({type: 'number', class: 'x2-input', width: '40px'});
+                const divX2 = createGroupingDiv({title: '2 выражение:'}, [coefX2, textX2, x2Operator, x2]);
+                taskCompletingDiv.insertBefore(divX2, answerFieldDiv);
+
+                const betweenOperator = createSelect({class: 'between-operator'}, {
+                    '=>': '=>',
+                    '/\\': '/\\'
+                });
+                const divBetween = createGroupingDiv({title: 'Знак между 1 и 2 скобками:'}, [betweenOperator]);
+                taskCompletingDiv.insertBefore(divBetween, answerFieldDiv);
+
+                const coefX3 = createInput({type: 'number', class: 'coef-x3', width: '30px'});
+                coefX3.classList.add('coef');
+                coefX3.style.display = 'none';
+
+                const textX3 = textX1;
+                const x3Operator = createSelect({class: 'x3-operator'}, {
+                    '<': '<',
+                    '>': '>',
+                    '>=': '>=',
+                    '<=': '<='
+                });
+                const x3 = createInput({type: 'number', class: 'x3-input', width: '40px'});
+                const divX3 = createGroupingDiv({title: '3 выражение:'}, [coefX3, textX3, x3Operator, x3]);
+                taskCompletingDiv.insertBefore(divX3, answerFieldDiv);
+
+                const x3_x4_Operator = createSelect({class: 'x3-x4-operator'}, {
+                    '=>': '=>',
+                    '/\\': '/\\'
+                });
+                const divX3X4 = createGroupingDiv({title: 'Знак между 3 и 4 выражениями:'}, [x3_x4_Operator]);
+                taskCompletingDiv.insertBefore(divX3X4, answerFieldDiv);
+
+                const coefX4 = createInput({type: 'number', class: 'coef-x4', width: '30px'});
+                coefX4.classList.add('coef');
+                coefX4.style.display = 'none';
+
+                const textX4 = textX1;
+                const x4Operator = createSelect({class: 'x4-operator'}, {
+                    '<': '<',
+                    '>': '>',
+                    '>=': '>=',
+                    '<=': '<='
+                });
+                const x4 = createInput({type: 'number', class: 'x4-input', width: '40px'});
+                const divX4 = createGroupingDiv({title: '4 выражение:'}, [coefX4, textX4, x4Operator, x4]);
+                taskCompletingDiv.insertBefore(divX4, answerFieldDiv);
+
+                const trueFalse = createSelect({class: 'true-false'}, {
+                    1: 'истинно',
+                    0: 'ложно'
+                });
+                const divTrueFalse = createGroupingDiv({title: 'Для которого логическое выражение:'}, [trueFalse]);
+                taskCompletingDiv.insertBefore(divTrueFalse, answerFieldDiv);
+
+                iscoefficient.addEventListener('change', function(){
+                    const coefs = document.querySelectorAll('.coef');
+                    if(this.checked){
+                        for(let coef of coefs){
+                            coef.style.display = 'inline';
+                            coef.value = '';
+                        }
+                    }
+                    else for(let coef of coefs) coef.style.display = 'none';
+                });
+            },
+            'generateAnswer': () => {
+                const trueNumbers = [];
+                
+                const getValue = (selector, isNumber = false) => {
+                    const element = document.querySelector(selector);
+                    if (!element) return isNumber ? 0 : '';
+                    return isNumber ? parseInt(element.value) || 0 : element.value;
+                };
+
+                const values = {
+                    1: {
+                        'coef': getValue('.coef-x1', true) || 1,
+                        'number': getValue('.x1-input', true),
+                        'operator': getValue('.x1-operator')
+                    },
+                    2: {
+                        'coef': getValue('.coef-x2', true) || 1,
+                        'number': getValue('.x2-input', true),
+                        'operator': getValue('.x2-operator')
+                    },
+                    3: {
+                        'coef': getValue('.coef-x3', true) || 1,
+                        'number': getValue('.x3-input', true),
+                        'operator': getValue('.x3-operator')
+                    },
+                    4: {
+                        'coef': getValue('.coef-x4', true) || 1,
+                        'number': getValue('.x4-input', true),
+                        'operator': getValue('.x4-operator')
+                    }
+                };
+
+                const x1x2Operator = getValue('.x1-x2-operator');
+                const x3x4Operator = getValue('.x3-x4-operator');
+                const betweenOperator = getValue('.between-operator');
+                const expectedResult = getValue('.true-false', true);
+
+                for(let i = min; i <= max; i++){
+                    try{
+                        const expr1 = operators[values[1].operator](i * values[1].coef, values[1].number);
+                        const expr2 = operators[values[2].operator](i * values[2].coef, values[2].number);
+                        const expr3 = operators[values[3].operator](i * values[3].coef, values[3].number);
+                        const expr4 = operators[values[4].operator](i * values[4].coef, values[4].number);
+
+                        const combined1 = operators[x1x2Operator](expr1, expr2);
+                        const combined2 = operators[x3x4Operator](expr3, expr4);
+                        const finalResult = operators[betweenOperator](combined1, combined2);
+
+                        if(finalResult === Boolean(expectedResult)){
+                            trueNumbers.push(i);
+                        }
+                    } catch (error) {
+                        console.error(`Ошибка при i=${i}:`, error);
+                    }
+                }
+
+                const answerType = getValue('.answer-type');
+                if(trueNumbers.length === 0) return 'Нет решений';
+
+                if(answerType === 'min') return Math.min(...trueNumbers);
+                else if(answerType === 'max') return Math.max(...trueNumbers);
+                else if(answerType === 'amount') return trueNumbers.length;
+                else if(answerType === 'summ') return trueNumbers.reduce((sum, num) => sum + num, 0);
+
+                return '';
+            }
+        }
+    },
+    7: {},
+    8: {},
+    9: {}
 };

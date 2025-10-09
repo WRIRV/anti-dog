@@ -115,6 +115,10 @@ p{
         align-items: center;
     }
 
+    html{
+        overflow-y: scroll;
+    }
+
     body{
         width: auto;
     }

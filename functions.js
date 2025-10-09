@@ -36,3 +36,16 @@ function createInput(inputProperties){
 function changeDot(floatNumber){
     return (floatNumber + '').replace('.', ',');
 }
+
+//для темы "преобразование логических выражений"
+const min = -500; // так называемый brute-force approach (слишком много кода и логики для подбора нужного диапазона)
+const max = 500;
+const operators = {
+    '>=': (number1, number2) => number1 >= number2,
+    '<=': (number1, number2) => number1 <= number2,
+    '>': (number1, number2) => number1 > number2,
+    '<': (number1, number2) => number1 < number2,
+    '=>': (value1, value2) => !value1 || value2,
+    '/\\': (value1, value2) => value1 && value2,
+    'V': (value1, value2) => value1 || value2,
+}
