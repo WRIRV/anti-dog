@@ -49,9 +49,18 @@ function generateTaskTypesList(themeId){
         option.innerHTML = taskTypes[typeId];
         selectType.append(option);
     }
+
+    //для темы "кодирование информации"
+    if(themeId === '7'){
+        const warning = document.createElement('p');
+        warning.classList.add('generated');
+        warning.style.color = 'red';
+        warning.innerHTML = 'Если ты чуть умнее табуретки, то наверное сможешь решить с помощью универсальной решалки похожие типы задач, просто подставляя разные значения и искать нужный в условии результат';
+        typeSelectingDiv.append(warning);
+    }
 }
 function removeGeneratedTaskTypes(){
-    const generatedTaskTypes = selectType.querySelectorAll('.generated');
+    const generatedTaskTypes = typeSelectingDiv.querySelectorAll('.generated');
     for(let taskType of generatedTaskTypes) taskType.remove();
 }
 

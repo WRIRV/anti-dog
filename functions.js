@@ -37,6 +37,16 @@ function changeDot(floatNumber){
     return (floatNumber + '').replace('.', ',');
 }
 
+function getValue(selector, isNumber = false){
+    const element = document.querySelector(selector);
+    if (!element) return isNumber ? '' : '';
+    if(isNumber){
+        if(isNaN(parseInt(element.value))) return '';
+        else return parseInt(element.value);
+    }
+    else return element.value || '';
+}
+
 //для темы "преобразование логических выражений"
 const min = -500; // так называемый brute-force approach (слишком много кода и логики для подбора нужного диапазона)
 const max = 500;
@@ -49,3 +59,6 @@ const operators = {
     '/\\': (value1, value2) => value1 && value2,
     'V': (value1, value2) => value1 || value2,
 }
+
+//для темы "кодирование информации"
+let symBuffer = 0;

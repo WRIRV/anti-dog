@@ -10,7 +10,14 @@ const taskThemes = {
     6: {
         1: 'Логические выражения'
     },
-    7: {},
+    7: {
+        1: 'сколько всего сущ. последовательностей символов...',
+        2: 'максимальное кол-во слов/кодов в языке/коде (универсальная)',
+        3: 'кодировочная таблица',
+        4: 'структура слова с ограничениями/количество слов',
+        5: 'для кодирования значений используется какой-то код',
+        6: 'вычисление количества байт памяти для всех номеров',
+    },
     8: {},
     9: {}
 };
@@ -165,7 +172,7 @@ const taskFunctional = {
             'generateInterface': () => {
                 //
                 const warning = document.createElement('p');
-                warning.innerHTML = 'БОЛЬШОЙ ШАНС НЕПРАВИЛЬНОГО ОТВЕТА (~40%)! ПРОВЕРЯЙТЕ ВЫВЕДЕННОЕ ЗНАЧЕНИЕ!';
+                warning.innerHTML = 'Если ответ равен 500 или -500, значит ответ на самом деле бесконечность (это ошибка собачки)';
                 warning.classList.add('generated-interface');
                 warning.style.color = 'red';
                 taskCompletingDiv.insertBefore(warning, answerFieldDiv);
@@ -285,12 +292,6 @@ const taskFunctional = {
             },
             'generateAnswer': () => {
                 const trueNumbers = [];
-                
-                const getValue = (selector, isNumber = false) => {
-                    const element = document.querySelector(selector);
-                    if (!element) return isNumber ? 0 : '';
-                    return isNumber ? parseInt(element.value) || 0 : element.value;
-                };
 
                 const values = {
                     1: {
@@ -320,6 +321,9 @@ const taskFunctional = {
                 const betweenOperator = getValue('.between-operator');
                 const expectedResult = getValue('.true-false', true);
 
+                console.log('Values:', values);
+                console.log('Operators:', { x1x2Operator, x3x4Operator, betweenOperator });
+
                 for(let i = min; i <= max; i++){
                     try{
                         const expr1 = operators[values[1].operator](i * values[1].coef, values[1].number);
@@ -339,8 +343,9 @@ const taskFunctional = {
                     }
                 }
 
+                console.log('Найденные числа:', trueNumbers);
+
                 const answerType = getValue('.answer-type');
-                if(trueNumbers.length === 0) return 'Нет решений';
 
                 if(answerType === 'min') return Math.min(...trueNumbers);
                 else if(answerType === 'max') return Math.max(...trueNumbers);
@@ -351,8 +356,241 @@ const taskFunctional = {
             }
         }
     },
-    7: {},
+    7: {
+        1: {
+            'generateInterface': () => {
+                const symbols = createInput({type: 'number', class: 'symbols', width: '30px'});
+                const symbolDiv = createGroupingDiv({title: 'Количество символов:'}, [symbols]);
+                taskCompletingDiv.insertBefore(symbolDiv, answerFieldDiv);
+
+                const rangeText1 = document.createElement('p').innerHTML = 'От';
+                const rangeStart = createInput({type: 'number', class: 'range-start', width: '30px'});
+                const rangeText2 = document.createElement('p').innerHTML = 'До';
+                const rangeEnd = createInput({type: 'number', class: 'range-end', width: '30px'});
+                const rangeText3 = document.createElement('p');
+                rangeText3.innerHTML = '(от X до X, если дана 1 длина, где X - эта длина)';
+                const rangeDiv = createGroupingDiv({title: 'Диапазон длин:', class: 'range-div'}, [rangeText1, rangeStart, rangeText2, rangeEnd, rangeText3]);
+                taskCompletingDiv.insertBefore(rangeDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                let variations = 0;
+                const symbols = getValue('.symbols', true);
+                const rangeStart = getValue('.range-start', true);
+                const rangeEnd = getValue('.range-end', true);
+
+                if(symbols === '' || rangeStart === '' || rangeEnd === '') return '';
+
+                if(rangeStart > rangeEnd){
+                    if(document.querySelector('.warning') !== null) return '';
+                    const rangeDiv = document.querySelector('.range-div');
+                    const warning = document.createElement('p');
+                    warning.innerHTML = 'Некорректное значение диапазона';
+                    warning.classList.add('warning');
+                    warning.style.color = 'red';
+                    rangeDiv.append(warning);
+                    return '';
+                }
+                else{
+                    const warning = document.querySelector('.warning');
+                    if(warning !== null) warning.remove();
+                }
+
+                for(let i = rangeStart; i <= rangeEnd; i++){
+                    variations += symbols ** i;
+                }
+
+                return variations;
+            }
+        },
+
+        2: {
+            'generateInterface': () => {
+                const alpabet = createInput({type: 'number', class: 'alphabet', width: '30px'});
+                const alpabetDiv = createGroupingDiv({title: 'Количество букв в алфавите:'}, [alpabet]);
+                taskCompletingDiv.insertBefore(alpabetDiv, answerFieldDiv);
+
+                const symbolsAmount = createInput({type: 'number', class: 'symbols-amount', width: '30px'});
+                const symbolsAmountDiv = createGroupingDiv({title: 'Количество букв в слове:'}, [symbolsAmount]);
+                taskCompletingDiv.insertBefore(symbolsAmountDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const symbolsAmount = getValue('.symbols-amount', true);
+                const alpabet = getValue('.alphabet', true);
+                if(symbolsAmount === '' || alpabet === '') return '';
+                return alpabet ** symbolsAmount;
+            }
+        },
+
+        3: {
+            'generateInterface': () => {
+                const code = createInput({type: 'text', class: 'code', width: '150px'});
+                const codeDiv = createGroupingDiv({title: 'Закодированный текст:'}, [code]);
+                taskCompletingDiv.insertBefore(codeDiv, answerFieldDiv);
+                code.addEventListener('beforeinput', function(ev){if(ev.data !== '0' && ev.data !== '1' && ev.data !== null) ev.preventDefault()});
+
+                const symbolText = document.createElement('p').innerHTML = 'Количество символов в таблице: ';
+                const symbolsAmount = createInput({type: 'number', class: 'symbols-amount', width: '30px'});
+
+                const table = document.createElement('table');
+                const symTr = document.createElement('tr');
+                symTr.style.textAlign = 'center';
+                const codeTr = document.createElement('tr');
+                table.append(symTr);
+                table.append(codeTr);
+                symbolsAmount.addEventListener('beforeinput', function(ev){
+                    if((ev.data === 'e' || this.value.length === 1) && ev.data !== null) ev.preventDefault();
+                    tableDataInputs = {};
+                    symBuffer = 0;
+                });
+
+                symbolsAmount.addEventListener('input', function(){
+                    if(this.value.length === 0) document.querySelectorAll('.table-data').forEach(function(el){el.remove()});
+                    symBuffer = getValue('.symbols-amount', true);
+                
+                    for(let i = 0; i < symBuffer; i++){
+                        const symTd = document.createElement('td');
+                        symTd.classList.add('table-data');
+                        const symInput = createInput({type: 'text', class: 'sym-' + i, width: '12px'});
+                        symInput.addEventListener('beforeinput', function(ev){if(this.value.length === 1 && ev.data !== null) ev.preventDefault()})
+                        symTd.append(symInput);
+                        symTr.append(symTd);
+
+                        const codeTd = document.createElement('td');
+                        codeTd.classList.add('table-data');
+                        const codeInput = createInput({type: 'number', class: 'code-' + i, width: '60px'});
+                        codeInput.addEventListener('beforeinput', function(ev){if(ev.data !== '0' && ev.data !== '1' && ev.data !== null) ev.preventDefault()});
+                        codeTd.append(codeInput);
+                        codeTr.append(codeTd);
+                    }
+                });
+
+                const tableDiv = createGroupingDiv({title: 'Таблица кодировки символов:'}, [symbolText, symbolsAmount, table]);
+                taskCompletingDiv.insertBefore(tableDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const tableData = {};
+                let answer = '';
+
+                for(let i = 0; i < symBuffer; i++){
+                    const sym = getValue('.sym-' + i, false);
+                    const code = getValue('.code-' + i, false);
+                    if(sym === '' || code === '') return '';
+
+                    tableData[code] = sym;
+                }
+
+                let code = getValue('.code', false);
+                if(code === '') return '';
+                let chunckCode = '';
+                for(let i = 0; i < code.length; i++){
+                    chunckCode += code[i];
+
+                    if(tableData[chunckCode]){
+                        answer += tableData[chunckCode];
+                        chunckCode = '';
+                    }
+                }
+
+                return answer;
+            }
+        },
+
+        4: {
+            'generateInterface': () => {
+                const n = createInput({type: 'number', class: 'n', width: '30px'});
+                const nDiv = createGroupingDiv({title: 'Количество букв в алфавите:'}, [n]);
+                taskCompletingDiv.insertBefore(nDiv, answerFieldDiv);
+
+                const pattern = createInput({type: 'text', class: 'pattern', width: '150px'});
+                const patternDiv = createGroupingDiv({title: 'Шаблон слова, который составляется по условию (одинаковые буквы обозначаются одинаковыми символами, например "abcddcba", где a, b, c, d - обозначение букв):'}, [pattern]);
+                taskCompletingDiv.insertBefore(patternDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const n = getValue('.n', true);
+                const pattern = getValue('.pattern', false);
+                if(pattern === '' || n === '') return '';
+
+                let usedptrns = [];
+                let answer = 1;
+                for(let i = 0; i < pattern.length; i++){
+                    if(usedptrns.includes(pattern[i])) continue;
+                    usedptrns.push(pattern[i]);
+                    answer *= n-i;
+                    console.log(pattern[i] + ', ' + answer + '  ' + usedptrns);
+                    
+                }
+
+                return answer;
+            }
+        },
+
+        5: {
+            'generateInterface': () => {
+                const num = createInput({type: 'number', class: 'num', width: '30px'});
+                const numDiv = createGroupingDiv({title: 'Код какой системы счисления используется:'}, [num]);
+                taskCompletingDiv.insertBefore(numDiv, answerFieldDiv);
+
+                const rangeText1 = document.createElement('p').innerHTML = 'От';
+                const rangeStart = createInput({type: 'number', class: 'range-start', width: '60px'});
+                const rangeText2 = document.createElement('p').innerHTML = 'До';
+                const rangeEnd = createInput({type: 'number', class: 'range-end', width: '60px'});
+                const rangeDiv = createGroupingDiv({title: 'Интервал чисел:', class: 'range-div'}, [rangeText1, rangeStart, rangeText2, rangeEnd]);
+                taskCompletingDiv.insertBefore(rangeDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const num = getValue('.num', true);
+                const rangeStart = getValue('.range-start', true);
+                const rangeEnd = getValue('.range-end', true);
+                if(num === '' || rangeStart === '' || rangeEnd === '') return '';
+
+                const diff = rangeEnd - rangeStart;
+                let i = 1;
+                while(true){
+                    if(num**i >= diff) return i;
+                    i++;
+                }
+            }
+        },
+
+        6: {
+            'generateInterface': () => {
+                const symAmount = createInput({type: 'number', class: 'sym-amount', width: '30px'});
+                const sAmountDiv = createGroupingDiv({title: 'Длина номера:'}, [symAmount]);
+                taskCompletingDiv.insertBefore(sAmountDiv, answerFieldDiv);
+
+                const n = createInput({type: 'number', class: 'n', width: '30px'});
+                const nDiv = createGroupingDiv({title: 'Количество символов для кодирования (вместе с цифрами и заглавными буквами):'}, [n]);
+                taskCompletingDiv.insertBefore(nDiv, answerFieldDiv);
+
+                const numAmount = createInput({type: 'number', class: 'num-amount', width: '40px'});
+                const numAmountDiv = createGroupingDiv({title: 'Количество номеров:'}, [numAmount]);
+                taskCompletingDiv.insertBefore(numAmountDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const symAmount = getValue('.sym-amount', true);
+                const n = getValue('.n', true);
+                const num = getValue('.num-amount', true);
+                if(symAmount === '' || n === '' || num === '') return '';
+                
+                let bit = 1;
+                while(true){
+                    if(2**bit >= n) break;
+                    bit++
+                }
+                
+                let minByte = 0;
+                if(symAmount*bit % 8 !== 0) minByte = Math.ceil(symAmount*bit / 8);
+                else minByte = symAmount*bit / 8;
+
+                return num * minByte;
+            }
+        },
+
+        7: {
+            'generateInterface': () => {},
+            'generateAnswer': () => {}
+        },
+    },
     8: {},
     9: {}
-
 };
