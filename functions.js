@@ -41,16 +41,60 @@ function getValue(selector, isNumber = false){
     const element = document.querySelector(selector);
     if (!element) return isNumber ? '' : '';
     if(isNumber){
-        if(isNaN(parseInt(element.value))) return '';
-        else return parseInt(element.value);
+        if(isNaN(element.value)) return '';
+        else return element.value*1;
     }
     else return element.value || '';
 }
 
+//для темы "системы счисления"
+const numbers = {
+    a: 10,
+    b: 11,
+    c: 12,
+    d: 13,
+    e: 14,
+    f: 15
+}
+const reverseNumbers = {};
+for(let number in numbers) reverseNumbers[numbers[number]] = number.toUpperCase();
+
+function to10Notation(number, notation){
+    let number10 = 0;
+    const coockedNumber = [];
+    for(let i = number.length - 1; i >= 0; i--){
+        if(parseInt(number[i]) >= notation) return '';
+        if(number[i].toLowerCase() in numbers){
+            if(numbers[number[i].toLowerCase()] >= notation) return '';
+            coockedNumber.push(numbers[number[i].toLowerCase()]);
+            continue;
+        }
+        coockedNumber.push(parseInt(number[i]));
+    }
+    for(let i = 0; i < coockedNumber.length; i++) number10 += coockedNumber[i] * notation**i;
+    return Number.isNaN(number10) ? '' : number10;
+}
+
+function toOtherNotation(number10, notation){
+    if(number10 === 0 || number10 == null) return '0';
+    if(notation < 2 || notation > 16 || notation == null) return '';
+
+    let number = [];
+
+    let divinedNum = number10;
+    while(divinedNum > 0){
+        const curNumber = divinedNum % notation;
+        number.unshift(curNumber > 9 ? reverseNumbers[curNumber] : curNumber);
+
+        divinedNum = Math.floor(divinedNum / notation);
+    }
+    return ''.concat(...number);
+}
+
 //для темы "преобразование логических выражений"
-const min = -500; // так называемый brute-force approach (слишком много кода и логики для подбора нужного диапазона)
+const min = -500; // так называемый brute-force approach (слишком много кода и логики для подбора нужного диапазона, мне лень ^-^)
 const max = 500;
-const operators = {
+const operators = { //также для темы "системы счисления"
     '>=': (number1, number2) => number1 >= number2,
     '<=': (number1, number2) => number1 <= number2,
     '>': (number1, number2) => number1 > number2,
@@ -58,6 +102,11 @@ const operators = {
     '=>': (value1, value2) => !value1 || value2,
     '/\\': (value1, value2) => value1 && value2,
     'V': (value1, value2) => value1 || value2,
+
+    '+': (number1, number2) => number1 + number2,
+    '-': (number1, number2) => number1 - number2,
+    '*': (number1, number2) => number1 * number2,
+    ':': (number1, number2) => number1 / number2
 }
 
 //для темы "кодирование информации"

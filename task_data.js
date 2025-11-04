@@ -5,18 +5,32 @@ const taskThemes = {
         1: 'Найти время одной записи',
         2: 'Во сколько раз первая запись больше второй'
     },
-    4: {},
-    5: {},
+    4: {
+        1: 'Перевод из одной системы в другую (универсальное)',
+        2: 'Арифметика',
+        3: 'Какое число следует/предшествует',
+        4: 'Определить основание X системы счисления',
+        5: 'Определить количество цифр в записи числа'
+    },
+    5: {
+        1: 'Размер файла и его передача через соединение',
+        2: 'Загрузка файлов куда-либо',
+        3: 'Найти средний размер одного файла',
+        4: 'Время передачи файла по каналу связи',
+        5: 'Файл, который можно передать за это же время'
+    },
     6: {
         1: 'Логические выражения'
     },
     7: {
-        1: 'сколько всего сущ. последовательностей символов...',
-        2: 'максимальное кол-во слов/кодов в языке/коде (универсальная)',
-        3: 'кодировочная таблица',
-        4: 'структура слова с ограничениями/количество слов',
-        5: 'для кодирования значений используется какой-то код',
-        6: 'вычисление количества байт памяти для всех номеров',
+        1: 'Сколько всего сущ. последовательностей символов...',
+        2: 'Максимальное кол-во слов/кодов в языке/коде (универсальное)',
+        3: 'Кодировочная таблица',
+        4: 'Структура слова с ограничениями/количество слов',
+        5: 'Для кодирования значений используется какой-то код',
+        6: 'Вычисление количества байт памяти для всех номеров',
+        7: 'Вычисление количества байт памяти для одного пользователя',
+        8: 'Вычисление байт для определённого кол-ва пользователей'
     },
     8: {},
     9: {}
@@ -67,26 +81,24 @@ const taskFunctional = {
                 taskCompletingDiv.insertBefore(divRound, answerFieldDiv);
             },
             'generateAnswer': () => {
-                let t = 0;
+                let V = getValue('.v-input', true);
+                const VSize = getValue('.v-size', false);
+                let f = getValue('.f-input', true);
+                const fSize = getValue('.f-size', false);
+                const i = getValue('.i-input', true);
+                const k = getValue('.k-select', true);
+                const roundSelect = getValue('.round-select', true);
+                console.log(V + ' ' + VSize, f + ' ' + fSize);
+                if(V === '' || VSize === '' || f === '' || fSize === '' || i === '' || k === '' || roundSelect === '') return '';
 
-                let V = document.querySelector('.v-input').value;
-                const sizeV = document.querySelector('.v-size');
-                if(sizeV.value === 'Kb') V *= 1024 * 8;
-                else if(sizeV.value === 'Mb') V *= 1024 * 1024 * 8;
+                if(VSize === 'Kb') V *= 1024 * 8;
+                else if(VSize === 'Mb') V *= 1024 * 1024 * 8;
 
-                let f = document.querySelector('.f-input').value;
-                const sizeF = document.querySelector('.f-size');
-                if(sizeF.value === 'KHz') f *= 1000;
+                if(fSize === 'KHz') f *= 1000;
 
-                let i = document.querySelector('.i-input').value;
-                let k = document.querySelector('.k-select').value;
-
-                const rounding = document.querySelector('.round-select');
-                if(rounding.value == 1) t = Math.round(V / (f * i * k));
-                else if (rounding.value == 2) t = (Math.round((V / (f * i * k)) * 10)) / 10;
-
-                if(!isNaN(t)) return changeDot(t);
-                return '';
+                const time = V / (f * i * k);
+                if(roundSelect == 1) return Math.round(time);
+                else if (roundSelect == 2) return changeDot(Math.round(time * 10) / 10);
             }
         },
         2: {
@@ -143,30 +155,417 @@ const taskFunctional = {
                 });
             },
             'generateAnswer': () => {
-                let answer = 0;
-
                 const isFEquals = document.querySelector('.f-f');
-                let f1 = document.querySelector('.f-input1').value;
-                if(isFEquals.checked) f1 = 1;
-                const i1 = document.querySelector('.i-input1').value;
+                let f1 = getValue('.f-input1', true);
+                const i1 = getValue('.i-input1', true);
                 const k1 = 2;
-
-                let f2 = document.querySelector('.f-input2').value;
-                if(isFEquals.checked) f2 = 1;
-                const i2 = document.querySelector('.i-input2').value;
+                let f2 = getValue('.f-input2', true);
+                const i2 = getValue('.i-input2', true);
                 const k2 = 1;
+                const roundSelect = getValue('.round-select', true);
+                if(isFEquals.checked) f1 = 1;
+                if(isFEquals.checked) f2 = 1;
+                if(f1 === '' || i1 === '' || f2 === '' || i2 === '') return '';
 
-                const rounding = document.querySelector('.round-select');
-                if(rounding.value == 1) answer = Math.round((f1 * i1 * k1) / (f2 * i2 * k2));
-                else if(rounding.value == 2) answer = (Math.round(((f1 * i1 * k1) / (f2 * i2 * k2)) * 10)) / 10;
+                const answer = (f1 * i1 * k1) / (f2 * i2 * k2);
+                if(roundSelect == 1) return Math.round(answer);
+                else if(roundSelect == 2) return changeDot(Math.round(answer * 10) / 10);
+            }
+        }
+    },
+    4: {
+        1: {
+            'generateInterface': () => {
+                const number = createInput({type: 'text', class: 'number', width: '50px'});
+                const numberText = document.createElement('p').innerHTML = '\tв системе счисления:\t';
+                const numberNotation = createInput({type: 'number', class: 'number-notation', width: '30px'});
+                const numberDiv = createGroupingDiv({title: 'Число:'}, [number, numberText, numberNotation]);
+                taskCompletingDiv.insertBefore(numberDiv, answerFieldDiv);
 
-                if(!isNaN(answer)) return changeDot(answer);
+                const answerNotation = createInput({type: 'number', class: 'answer-notation', width: '30px'});
+                const answerText = document.createElement('p').innerHTML = '\tсистему счисления';
+                const answerDiv = createGroupingDiv({title: 'Перевести в:'}, [answerNotation, answerText]);
+                taskCompletingDiv.insertBefore(answerDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const number = getValue('.number', false);
+                const numberNotation = getValue('.number-notation', true);
+                const answerNotation = getValue('.answer-notation', true);
+                if(number === '' || numberNotation === '' || answerNotation === '') return '';
+                
+                const number10 = to10Notation(number, numberNotation);
+
+                return toOtherNotation(number10, answerNotation);
+            }
+        },
+
+        2: {
+            'generateInterface': () => {
+                const numberNotation = createInput({type: 'number', class: 'numbers-notation', width: '30px'});
+                const numberText = document.createElement('p').innerHTML = '\tсистеме счисления:';
+                const numberDiv = createGroupingDiv({title: 'Числа, записанные в:'}, [numberNotation, numberText]);
+                numberDiv.style.marginBottom = '20px';
+                taskCompletingDiv.insertBefore(numberDiv, answerFieldDiv);
+
+                const number1 = createInput({type: 'text', class: 'number1', width: '50px'});
+                const operator = createSelect({class: 'operator'}, {
+                    '+': '+',
+                    '-': '-',
+                    '*': '*',
+                    ':': ':'
+                });
+                const number2 = createInput({type: 'text', class: 'number2', width: '50px'});
+                const expDiv = createGroupingDiv({}, [number1, operator, number2]);
+                taskCompletingDiv.insertBefore(expDiv, answerFieldDiv);
+
+                const answerNotation = createInput({type: 'number', class: 'answer-notation', width: '30px'});
+                const answerText = document.createElement('p').innerHTML = '\tсистеме счисления';
+                const answerDiv = createGroupingDiv({title: 'Записать в:'}, [answerNotation, answerText]);
+                taskCompletingDiv.insertBefore(answerDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const numbersNotation = getValue('.numbers-notation', true);
+                const number1 = getValue('.number1', false);
+                const number2 = getValue('.number2', false);
+                const operator = getValue('.operator', false);
+                const answerNotation = getValue('.answer-notation', true);
+                if(numbersNotation === '' || number1 === '' || number2 === '' || operator === '' || answerNotation === '') return '';
+                
+                const metaAnswer = operators[operator](to10Notation(number1, numbersNotation), to10Notation(number2, numbersNotation));
+                return toOtherNotation(metaAnswer, answerNotation);
+            }
+        },
+
+        3: {
+            'generateInterface': () => {
+                const numberNotation = createInput({type: 'number', class: 'number-notation', width: '30px'});
+                const numberDiv = createGroupingDiv({title: 'Система счисления:'}, [numberNotation]);
+                taskCompletingDiv.insertBefore(numberDiv, answerFieldDiv);
+
+                const number = createInput({type: 'text', class: 'number', width: '50px'});
+                const numDiv = createGroupingDiv({title: 'Число:'}, [number]);
+                taskCompletingDiv.insertBefore(numDiv, answerFieldDiv);
+
+                const operation = createSelect({class: 'operation'}, {
+                    '0': 'следует',
+                    '1': 'предшествует'
+                });
+                const opDiv = createGroupingDiv({title: 'Найти число, которое:'}, [operation]);
+                taskCompletingDiv.insertBefore(opDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const numberNotation = getValue('.number-notation', true);
+                const number = getValue('.number', false);
+                const operation = getValue('.operation', true);
+                if(numberNotation === '' || number === '' || operation === '') return '';
+
+                const changedNumber = to10Notation(number, numberNotation);
+                return operation ? toOtherNotation(changedNumber - 1, numberNotation) : toOtherNotation(changedNumber + 1, numberNotation);
+            }
+        },
+
+        4: {
+            'generateInterface': () => {
+                const number1 = createInput({type: 'text', class: 'number1', width: '50px'});
+                number1.style.fontSize = '24px';
+                const num1Notation = createInput({type: 'number', class: 'number1-notation', width: '30px'});
+                const expText1 = document.createElement('p').innerHTML = '\t=\t';
+                const number2 = createInput({type: 'text', class: 'number2', width: '50px'});
+                number2.style.fontSize = '24px';
+                const expText2 = document.createElement('p').innerHTML = '\tX\t';
+                const expDiv = createGroupingDiv({title: 'Напиши уравнение:'}, [number1, num1Notation, expText1, number2, expText2]);
+                taskCompletingDiv.insertBefore(expDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const number1 = getValue('.number1', false);
+                const num1Notation = getValue('.number1-notation', true);
+                const number2 = getValue('.number2', false);
+                if(number1 === '' || number2 === '' || num1Notation === '') return '';
+
+                const number10 = to10Notation(number1, num1Notation);
+                let notation = 2;
+                while(toOtherNotation(number10, notation) != number2){
+                    notation++;
+                    if(notation >= 16) return '';
+                }
+                return notation;
+            }
+        },
+
+        5: {
+            'generateInterface': () => {
+                const numNotation = createInput({type: 'number', class: 'number-notation', width: '30px'});
+                const numNotationDiv = createGroupingDiv({title: 'Число в системе счисления:'}, [numNotation]);
+                taskCompletingDiv.insertBefore(numNotationDiv, answerFieldDiv);
+
+                const number = createInput({type: 'text', class: 'number', width: '50px'});
+                const numberDiv = createGroupingDiv({title: 'Число:'}, [number]);
+                taskCompletingDiv.insertBefore(numberDiv, answerFieldDiv);
+
+                const nums = createInput({type: 'text', class: 'nums', width: '30px'});
+                const numsDiv = createGroupingDiv({title: 'Определить количество каких цифр:'}, [nums]);
+                taskCompletingDiv.insertBefore(numsDiv, answerFieldDiv);
+
+                const answerNotation = createInput({type: 'number', class: 'answer-notation', width: '30px'});
+                const answerNotationDiv = createGroupingDiv({title: 'В эквиваленте числа какой системы счисления:'}, [answerNotation]);
+                taskCompletingDiv.insertBefore(answerNotationDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const number = getValue('.number', false);
+                const numNotation = getValue('.number-notation', true);
+                const nums = getValue('.nums', false);
+                const answerNotation = getValue('.answer-notation', true);
+                if(number === '' || numNotation === '' || nums === '' || answerNotation === '') return '';
+
+                let numsCounter = 0;
+                const trueNumber = toOtherNotation(to10Notation(number, numNotation), answerNotation);
+                for(let num of trueNumber) num === nums && numsCounter++;
+                return numsCounter;
+            }
+        }
+    },
+    5: {
+        1: {
+            'generateInterface': () => {
+                const fileSize = createInput({type: 'number', class: 'file-size', width: '40px'});
+                const metric = createSelect({class: 'metric'}, {
+                    'Kbyte': 'Кбайт',
+                    'byte': 'байт'
+                });
+                const fsDiv = createGroupingDiv({title: 'Файл размером:'}, [fileSize, metric]);
+                taskCompletingDiv.insertBefore(fsDiv, answerFieldDiv);
+
+                const minutes = createInput({type: 'number', class: 'minutes', width: '30px'});
+                const minText1 = document.createElement('p').innerHTML = '\tмин\t';
+                const seconds = createInput({type: 'number', class: 'seconds', width: '30px'});
+                const secText1 = document.createElement('p').innerHTML = '\tсек';
+                const timeDiv = createGroupingDiv({title: 'Время загрузки файлов:'}, [minutes, minText1, seconds, secText1]);
+                taskCompletingDiv.insertBefore(timeDiv, answerFieldDiv);
+
+                const finalMinutes = createInput({type: 'number', class: 'final-minutes', width: '30px'});
+                const minText2 = document.createElement('p').innerHTML = '\tмин\t';
+                const finalSeconds = createInput({type: 'number', class: 'final-seconds', width: '30px'});
+                const secText2 = document.createElement('p').innerHTML = '\tсек';
+                const timeDesc = document.createElement('p');
+                timeDesc.innerHTML = '(оставить минуты пустыми, если их нет)';
+                const finalTimeDiv = createGroupingDiv({title: 'Должно передаваться в течение:'}, [finalMinutes, minText2, finalSeconds, secText2, timeDesc]);
+                taskCompletingDiv.insertBefore(finalTimeDiv, answerFieldDiv);
+
+                const answerMetric = createSelect({class: 'answer-metric'}, {
+                    'Kbyte': 'Кбайт',
+                    'byte': 'байт'
+                });
+                const metricDiv = createGroupingDiv({title: 'Ответ указать в:'}, [answerMetric]);
+                taskCompletingDiv.insertBefore(metricDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                let fileSize = getValue('.file-size', true);
+                const metric = getValue('.metric', false);
+                const minutes = getValue('.minutes', true) || 0;
+                const seconds = getValue('.seconds', true);
+                const finalMinutes = getValue('.final-minutes', true) || 0;
+                const finalSeconds = getValue('.final-seconds', true);
+                const answerMetric = getValue('.answer-metric', false);
+                if(fileSize === '' || metric === '' || seconds === '' || finalSeconds === '' || answerMetric === '') return '';
+
+                if(metric === 'Kbyte') fileSize *= 1024*8;
+                else if(metric === 'byte') fileSize *= 8;
+
+                const time = minutes*60 + seconds;
+                const finalTime = finalMinutes*60 + finalSeconds;
+                let ioSpeed = 0;
+                let finalSize = 0;
+                ioSpeed = fileSize / time;
+                finalSize = ioSpeed * finalTime;
+
+                if(answerMetric === 'Kbyte') return finalSize /= 8*1024;
+                else if(answerMetric === 'byte') return finalSize /= 8;
+            }
+        },
+
+        2: {
+            'generateInterface': () => {
+                const fileAmount = createInput({type: 'number', class: 'file-amount', width: '30px'});
+                const FAText = document.createElement('p').innerHTML = '\tфайлов';
+                const FADiv = createGroupingDiv({title: 'Количество файлов:'}, [fileAmount, FAText]);
+                taskCompletingDiv.insertBefore(FADiv, answerFieldDiv);
+
+                const fileSize = createInput({type: 'number', class: 'file-size', width: '50px'});
+                const metric = createSelect({class: 'metric'}, {
+                    'byte': 'байт',
+                    'Kbyte': 'Кбайт'
+                });
+                const fsDiv = createGroupingDiv({title: 'Средний размер файлов:'}, [fileSize, metric]);
+                taskCompletingDiv.insertBefore(fsDiv, answerFieldDiv);
+
+                const minutes = createInput({type: 'number', class: 'minutes', width: '30px'});
+                const minText = document.createElement('p').innerHTML = '\tмин\t';
+                const seconds = createInput({type: 'number', class: 'seconds', width: '30px'});
+                const secText = document.createElement('p').innerHTML = '\tсек';
+                const timeDesc = document.createElement('p');
+                timeDesc.innerHTML = '(оставить минуты пустыми, если их нет)';
+                const timeDiv = createGroupingDiv({title: 'Время загрузки файлов:'}, [minutes, minText, seconds, secText, timeDesc]);
+                taskCompletingDiv.insertBefore(timeDiv, answerFieldDiv);
+
+                const answerMetric = createSelect({class: 'answer-metric'}, { //ОТВЕТ МОЖЕТ БЫТЬ И НАХОЖДЕНИЕ РАЗМЕРА ФАЙЛА
+                    'Kbit': 'Кбит/с',
+                    'bit': 'бит/с'
+                });
+                const metricDiv = createGroupingDiv({title: 'Ответ указать в:'}, [answerMetric]);
+                taskCompletingDiv.insertBefore(metricDiv, answerFieldDiv);
+
+                const answerRound = createSelect({class: 'answer-round'}, {
+                    '0': 'До целых',
+                    '1': 'До десятых'
+                });
+                const roundDiv = createGroupingDiv({title: 'Ответ округлить:'}, [answerRound]);
+                taskCompletingDiv.insertBefore(roundDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const fileAmount = getValue('.file-amount', true);
+                let fileSize = getValue('.file-size', true);
+                const metric = getValue('.metric', false);
+                const minutes = getValue('.minutes', true) || 0;
+                const seconds = getValue('.seconds', true);
+                const answerMetric = getValue('.answer-metric', false);
+                const answerRound = getValue('.answer-round', false);
+                if(fileAmount === '' || fileSize === '' || metric === '' || seconds === '' || answerMetric === '' || answerRound === '') return '';
+
+                if(metric === 'Kbyte') fileSize *= 1024*8 * fileAmount;
+                else if(metric === 'byte') fileSize *= 8 * fileAmount;
+
+                if(answerMetric === 'Kbit') fileSize /= 1024;
+                else if(answerMetric === 'bit') fileSize = fileSize;
+
+                const time = minutes*60 + seconds;
+                let ioSpeed = fileSize / time;
+                if(answerRound === '0') return Math.round(ioSpeed);
+                else if(answerRound === '1') return changeDot(Math.round(ioSpeed * 10) / 10);
+            }
+        },
+
+        3: {
+            'generateInterface': () => {
+                const fileAmount = createInput({type: 'number', class: 'file-amount', width: '30px'});
+                const FAText = document.createElement('p').innerHTML = '\tфайлов';
+                const FADiv = createGroupingDiv({title: 'Количество файлов:'}, [fileAmount, FAText]);
+                taskCompletingDiv.insertBefore(FADiv, answerFieldDiv);
+
+                const time = createInput({type: 'number', class: 'time', width: '30px'});
+                const timeText = document.createElement('p').innerHTML = '\tсекунд';
+                const timeDiv = createGroupingDiv({title: 'Загрузка длилась:'}, [time, timeText]);
+                taskCompletingDiv.insertBefore(timeDiv, answerFieldDiv);
+
+                const ioSpeed = createInput({type: 'number', class: 'io-speed', width: '40px'});
+                const ioMetric = createSelect({class: 'io-metric'}, {
+                    'Kbit': 'Кбит/сек',
+                    'bit': 'бит/сек'
+                });
+                const ioDiv = createGroupingDiv({title: 'Скорость передачи данных:'}, [ioSpeed, ioMetric]);
+                taskCompletingDiv.insertBefore(ioDiv, answerFieldDiv);
+
+                const answerMetric = createSelect({class: 'answer-metric'}, {
+                    'Kbyte': 'Кбайт',
+                    'byte': 'байт'
+                });
+                const metricDiv = createGroupingDiv({title: 'Ответ указать в:'}, [answerMetric]);
+                taskCompletingDiv.insertBefore(metricDiv, answerFieldDiv);
+
+                const answerRound = createSelect({class: 'answer-round'}, {
+                    '0': 'До целых',
+                    '1': 'До десятых'
+                });
+                const roundDiv = createGroupingDiv({title: 'Ответ округлить:'}, [answerRound]);
+                taskCompletingDiv.insertBefore(roundDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const fileAmount = getValue('.file-amount', true);
+                const time = getValue('.time', true);
+                let ioSpeed = getValue('.io-speed', true);
+                const ioMetric = getValue('.io-metric', false);
+                const answerMetric = getValue('.answer-metric', false);
+                const answerRound = getValue('.answer-round', false);
+                if(fileAmount === '' || time === '' || ioSpeed === '' || ioMetric === '' || answerMetric === '' || answerRound === '') return '';
+
+                if(ioMetric === 'Kbit') ioSpeed *= 1024;
+                else if(ioMetric === 'bit') ioSpeed = ioSpeed;
+
+                let fileSize = time * ioSpeed / fileAmount;
+                if(answerMetric === 'Kbyte') fileSize /= 8*1024;
+                else if(answerMetric === 'byte') fileSize /= 8;
+
+                if(answerRound === '0') return Math.round(fileSize);
+                else if(answerRound === '1') return changeDot(Math.round(fileSize * 10) / 10);
+            }
+        },
+
+        4: {
+            'generateInterface': () => {
+                const ioSpeed = createInput({type: 'number', class: 'io-speed', width: '50px'});
+                const ioText = document.createElement('p').innerHTML = '\tбит/с';
+                const ioDiv = createGroupingDiv({title: 'Пропускная способность канала свзяи:'}, [ioSpeed, ioText]);
+                taskCompletingDiv.insertBefore(ioDiv, answerFieldDiv);
+
+                const fileSize = createInput({type: 'number', class: 'file-size', width: '50px'});
+                const metric = createSelect({class: 'metric'}, {
+                    'Kbyte': 'Кбайт',
+                    'byte': 'байт'
+                });
+                const fsDiv = createGroupingDiv({title: 'Размер файла:'}, [fileSize, metric]);
+                taskCompletingDiv.insertBefore(fsDiv, answerFieldDiv);
+
+                const timeMetric = createSelect({class: 'time-metric'}, {
+                    'second': 'Секундах',
+                    'minute': 'Минутах'
+                });
+                const TMDiv = createGroupingDiv({title: 'Ответ записать в:'}, [timeMetric]);
+                taskCompletingDiv.insertBefore(TMDiv, answerFieldDiv);
+
+                const answerRound = createSelect({class: 'answer-round'}, {
+                    '0': 'До целых',
+                    '1': 'До десятых'
+                });
+                const roundDiv = createGroupingDiv({title: 'Ответ округлить:'}, [answerRound]);
+                taskCompletingDiv.insertBefore(roundDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const ioSpeed = getValue('.io-speed', true);
+                let fileSize = getValue('.file-size', true);
+                const timeMetric = getValue('.time-metric', false);
+                const metric = getValue('.metric', false);
+                const answerRound = getValue('.answer-round', false);
+                if(ioSpeed === '' || fileSize === '' || metric === '' || answerRound === '') return '';
+
+                if(metric === 'Kbyte') fileSize *= 1024*8;
+                else if(metric === 'byte') fileSize *= 8;
+
+                let time = 0;
+                if(timeMetric === 'second') time = fileSize / ioSpeed;
+                else if(timeMetric === 'minute') time = fileSize / ioSpeed / 60;
+
+                if(answerRound === '0') return Math.round(time);
+                else if(answerRound === '1') return changeDot(Math.round(time * 10) / 10);
+            }
+        },
+
+        5: {
+            'generateInterface': () => {
+
+            },
+            'generateAnswer': () => {
+                return '';
+            }
+        },
+
+        6: {
+            'generateInterface': () => {
+
+            },
+            'generateAnswer': () => {
                 return '';
             }
         }
     },
-    4: {},
-    5: {},
     6: {
         1:{
             'generateInterface': () => {
@@ -515,9 +914,7 @@ const taskFunctional = {
                 for(let i = 0; i < pattern.length; i++){
                     if(usedptrns.includes(pattern[i])) continue;
                     usedptrns.push(pattern[i]);
-                    answer *= n-i;
-                    console.log(pattern[i] + ', ' + answer + '  ' + usedptrns);
-                    
+                    answer *= n-i;                    
                 }
 
                 return answer;
@@ -544,10 +941,11 @@ const taskFunctional = {
                 if(num === '' || rangeStart === '' || rangeEnd === '') return '';
 
                 const diff = rangeEnd - rangeStart;
-                let i = 1;
+                let i = 0;
                 while(true){
-                    if(num**i >= diff) return i;
                     i++;
+                    if(num**i >= diff) return i;
+                    if(i >= 20) return '';
                 }
             }
         },
@@ -572,10 +970,11 @@ const taskFunctional = {
                 const num = getValue('.num-amount', true);
                 if(symAmount === '' || n === '' || num === '') return '';
                 
-                let bit = 1;
+                let bit = 0;
                 while(true){
+                    bit++;
                     if(2**bit >= n) break;
-                    bit++
+                    if(bit >= 20) return '';
                 }
                 
                 let minByte = 0;
@@ -587,8 +986,73 @@ const taskFunctional = {
         },
 
         7: {
-            'generateInterface': () => {},
-            'generateAnswer': () => {}
+            'generateInterface': () => {
+                const symAmount = createInput({type: 'number', class: 'sym-amount', width: '30px'});
+                const sAmountDiv = createGroupingDiv({title: 'Длина номера:'}, [symAmount]);
+                taskCompletingDiv.insertBefore(sAmountDiv, answerFieldDiv);
+
+                const n = createInput({type: 'number', class: 'n', width: '30px'});
+                const nDiv = createGroupingDiv({title: 'Количество символов для кодирования (вместе с цифрами и заглавными буквами):'}, [n]);
+                taskCompletingDiv.insertBefore(nDiv, answerFieldDiv);
+
+                const users = createInput({type: 'number', class: 'users', width: '50px'});
+                const usersDiv = createGroupingDiv({title: 'Количество пользователей:'}, [users]);
+                taskCompletingDiv.insertBefore(usersDiv, answerFieldDiv);
+
+                const inf = createInput({type: 'number', class: 'inf', width: '50px'});
+                const infDiv = createGroupingDiv({title: 'Сколько потребовалось байт для хранения:'}, [inf]);
+                taskCompletingDiv.insertBefore(infDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const symAmount = getValue('.sym-amount', true);
+                const n = getValue('.n', true);
+                const users = getValue('.users', true);
+                const bytes = getValue('.inf', true);
+                if(symAmount === '' || n === '' || users === '' || bytes === '') return '';
+
+                let bit = 0;
+                while(true){
+                    bit++;
+                    if(2**bit >= n) break;
+                    if(bit >= 20) return '';
+                }
+                let minByte = 0;
+                if(symAmount*bit % 8 !== 0) minByte = Math.ceil(symAmount*bit / 8);
+                else minByte = symAmount*bit / 8;
+
+                let addData = 0;
+                while(true){
+                    addData++;
+                    if(users * (minByte + addData) === bytes) return addData;
+                    else if(users * (minByte + addData) > bytes) return '';
+                }
+            }
+        },
+
+        8: {
+            'generateInterface': () => {
+                const users = createInput({type: 'number', class: 'users', width: '50px'});
+                const usersDiv = createGroupingDiv({title: 'Количество людей (спортсменов):'}, [users]);
+                taskCompletingDiv.insertBefore(usersDiv, answerFieldDiv);
+
+                const finishedUsers = createInput({type: 'number', class: 'finished-users', width: '50px'});
+                const finishedUsersDiv = createGroupingDiv({title: 'Финиширующие люди (спортсмены):'}, [finishedUsers]);
+                taskCompletingDiv.insertBefore(finishedUsersDiv, answerFieldDiv);
+            },
+            'generateAnswer': () => {
+                const users = getValue('.users', true);
+                const finishedUsers = getValue('.finished-users', true);
+                if(users === '' || finishedUsers === '') return '';
+
+                let bit = 0;
+                while(true){
+                    bit++;
+                    if(2**bit >= users) break;
+                    if(bit >= 20) return '';
+                }
+
+                return Math.ceil(finishedUsers * bit / 8);
+            }
         },
     },
     8: {},
