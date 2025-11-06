@@ -81,14 +81,13 @@ const taskFunctional = {
                 taskCompletingDiv.insertBefore(divRound, answerFieldDiv);
             },
             'generateAnswer': () => {
-                let V = getValue('.v-input', true);
+                let V = getFloatValue('.v-input', true);
                 const VSize = getValue('.v-size', false);
-                let f = getValue('.f-input', true);
+                let f = getFloatValue('.f-input', true);
                 const fSize = getValue('.f-size', false);
                 const i = getValue('.i-input', true);
                 const k = getValue('.k-select', true);
                 const roundSelect = getValue('.round-select', true);
-                console.log(V + ' ' + VSize, f + ' ' + fSize);
                 if(V === '' || VSize === '' || f === '' || fSize === '' || i === '' || k === '' || roundSelect === '') return '';
 
                 if(VSize === 'Kb') V *= 1024 * 8;
@@ -156,10 +155,10 @@ const taskFunctional = {
             },
             'generateAnswer': () => {
                 const isFEquals = document.querySelector('.f-f');
-                let f1 = getValue('.f-input1', true);
+                let f1 = getFloatValue('.f-input1', true);
                 const i1 = getValue('.i-input1', true);
                 const k1 = 2;
-                let f2 = getValue('.f-input2', true);
+                let f2 = getFloatValue('.f-input2', true);
                 const i2 = getValue('.i-input2', true);
                 const k2 = 1;
                 const roundSelect = getValue('.round-select', true);
@@ -279,14 +278,14 @@ const taskFunctional = {
             'generateAnswer': () => {
                 const number1 = getValue('.number1', false);
                 const num1Notation = getValue('.number1-notation', true);
-                const number2 = getValue('.number2', false);
+                const number2 = (getValue('.number2', false)).toUpperCase();
                 if(number1 === '' || number2 === '' || num1Notation === '') return '';
 
                 const number10 = to10Notation(number1, num1Notation);
                 let notation = 2;
                 while(toOtherNotation(number10, notation) != number2){
                     notation++;
-                    if(notation >= 16) return '';
+                    if(notation > 16) return '';
                 }
                 return notation;
             }
@@ -385,6 +384,11 @@ const taskFunctional = {
 
         2: {
             'generateInterface': () => {
+                const answerChange = createInput({type: 'checkbox', class: 'answer-change'});
+                const ACtext = document.createElement('p').innerHTML = '\tнайти средний размер одного файла';
+                const ACDiv = createGroupingDiv({}, [answerChange, ACtext]);
+                taskCompletingDiv.insertBefore(ACDiv, answerFieldDiv);
+
                 const fileAmount = createInput({type: 'number', class: 'file-amount', width: '30px'});
                 const FAText = document.createElement('p').innerHTML = '\tфайлов';
                 const FADiv = createGroupingDiv({title: 'Количество файлов:'}, [fileAmount, FAText]);
@@ -395,8 +399,17 @@ const taskFunctional = {
                     'byte': 'байт',
                     'Kbyte': 'Кбайт'
                 });
-                const fsDiv = createGroupingDiv({title: 'Средний размер файлов:'}, [fileSize, metric]);
+                const fsDiv = createGroupingDiv({title: 'Средний размер файлов:', class: 'speed'}, [fileSize, metric]);
                 taskCompletingDiv.insertBefore(fsDiv, answerFieldDiv);
+
+                const ioSpeed = createInput({type: 'number', class: 'io-speed', width: '40px'});
+                const fileMetric = createSelect({class: 'io-metric'}, {
+                    'Kbit': 'Кбит/с',
+                    'bit': 'бит/с'
+                });
+                const fileMetricDiv = createGroupingDiv({title: 'Ответ указать в:', class: 'file'}, [ioSpeed, fileMetric]);
+                fileMetricDiv.style.display = 'none';
+                taskCompletingDiv.insertBefore(fileMetricDiv, answerFieldDiv);
 
                 const minutes = createInput({type: 'number', class: 'minutes', width: '30px'});
                 const minText = document.createElement('p').innerHTML = '\tмин\t';
@@ -407,12 +420,20 @@ const taskFunctional = {
                 const timeDiv = createGroupingDiv({title: 'Время загрузки файлов:'}, [minutes, minText, seconds, secText, timeDesc]);
                 taskCompletingDiv.insertBefore(timeDiv, answerFieldDiv);
 
-                const answerMetric = createSelect({class: 'answer-metric'}, { //ОТВЕТ МОЖЕТ БЫТЬ И НАХОЖДЕНИЕ РАЗМЕРА ФАЙЛА
+                const answerMetric = createSelect({class: 'answer-metric'}, {
                     'Kbit': 'Кбит/с',
                     'bit': 'бит/с'
                 });
-                const metricDiv = createGroupingDiv({title: 'Ответ указать в:'}, [answerMetric]);
+                const metricDiv = createGroupingDiv({title: 'Ответ указать в:', class: 'speed'}, [answerMetric]);
                 taskCompletingDiv.insertBefore(metricDiv, answerFieldDiv);
+
+                const fileAnswerMetric = createSelect({class: 'file-answer-metric'}, {
+                    'Kbyte': 'Кбайт',
+                    'byte': 'байт'
+                });
+                const fileAnswerMetricDiv = createGroupingDiv({title: 'Ответ указать в:', class: 'file'}, [fileAnswerMetric]);
+                fileAnswerMetricDiv.style.display = 'none';
+                taskCompletingDiv.insertBefore(fileAnswerMetricDiv, answerFieldDiv);
 
                 const answerRound = createSelect({class: 'answer-round'}, {
                     '0': 'До целых',
@@ -420,27 +441,65 @@ const taskFunctional = {
                 });
                 const roundDiv = createGroupingDiv({title: 'Ответ округлить:'}, [answerRound]);
                 taskCompletingDiv.insertBefore(roundDiv, answerFieldDiv);
+
+                answerChange.addEventListener('change', function(){
+                    const fileObjects = document.querySelectorAll('.file');
+                    const speedObjects = document.querySelectorAll('.speed');
+                    if(this.checked){
+                        for(let object of speedObjects) object.style.display = 'none';
+                        for(let object of fileObjects) object.style.display = 'block';
+                    }
+                    else{
+                        for(let object of speedObjects) object.style.display = 'block';
+                        for(let object of fileObjects) object.style.display = 'none';
+                    }
+                });
             },
             'generateAnswer': () => {
+                const answerChange = document.querySelector('.answer-change');
                 const fileAmount = getValue('.file-amount', true);
                 let fileSize = getValue('.file-size', true);
                 const metric = getValue('.metric', false);
+                let inputIoSpeed = getValue('.io-speed', true);
+                const ioMetric = getValue('.io-metric', false);
                 const minutes = getValue('.minutes', true) || 0;
                 const seconds = getValue('.seconds', true);
                 const answerMetric = getValue('.answer-metric', false);
+                const fileAnswerMetric = getValue('.file-answer-metric', false);
                 const answerRound = getValue('.answer-round', false);
-                if(fileAmount === '' || fileSize === '' || metric === '' || seconds === '' || answerMetric === '' || answerRound === '') return '';
-
-                if(metric === 'Kbyte') fileSize *= 1024*8 * fileAmount;
-                else if(metric === 'byte') fileSize *= 8 * fileAmount;
-
-                if(answerMetric === 'Kbit') fileSize /= 1024;
-                else if(answerMetric === 'bit') fileSize = fileSize;
+                if(answerChange.checked){
+                    fileSize = 1;
+                }
+                else{
+                    inputIoSpeed = 1;
+                }
+                if(fileAmount === '' || fileSize === '' || metric === '' || seconds === '' || answerMetric === '' || answerRound === '' ||
+                    inputIoSpeed === '' || ioMetric === '' || fileAnswerMetric === ''
+                ) return '';
 
                 const time = minutes*60 + seconds;
-                let ioSpeed = fileSize / time;
-                if(answerRound === '0') return Math.round(ioSpeed);
-                else if(answerRound === '1') return changeDot(Math.round(ioSpeed * 10) / 10);
+                if(answerChange.checked){
+                    if(ioMetric === 'Kbit') inputIoSpeed *= 1024;
+                    else if(ioMetric === 'bit') inputIoSpeed = inputIoSpeed;
+
+                    let fileSize = time * inputIoSpeed / fileAmount;
+                    if(fileAnswerMetric === 'Kbyte') fileSize /= 8*1024;
+                    else if(fileAnswerMetric === 'byte') fileSize /= 8;
+
+                    if(answerRound === '0') return Math.round(fileSize);
+                    else if(answerRound === '1') return changeDot(Math.round(fileSize * 10) / 10);
+                }
+                else{
+                    if(metric === 'Kbyte') fileSize *= 1024*8 * fileAmount;
+                    else if(metric === 'byte') fileSize *= 8 * fileAmount;
+
+                    if(answerMetric === 'Kbit') fileSize /= 1024;
+                    else if(answerMetric === 'bit') fileSize = fileSize;
+
+                    let ioSpeed = fileSize / time;
+                    if(answerRound === '0') return Math.round(ioSpeed);
+                    else if(answerRound === '1') return changeDot(Math.round(ioSpeed * 10) / 10);
+                }
             }
         },
 
@@ -550,10 +609,73 @@ const taskFunctional = {
 
         5: {
             'generateInterface': () => {
+                const fileSize = createInput({type: 'number', class: 'file-size', width: '50px'});
+                const metric = createSelect({class: 'metric'}, {
+                    'Kbyte': 'Кбайт',
+                    'byte': 'байт'
+                });
+                const fsDiv = createGroupingDiv({title: 'Размер файла:'}, [fileSize, metric]);
+                taskCompletingDiv.insertBefore(fsDiv, answerFieldDiv);
 
+                const ioSpeed = createInput({type: 'number', class: 'io-speed', width: '40px'});
+                const ioMetric = createSelect({class: 'io-metric'}, {
+                    'Kbit': 'Кбит/сек',
+                    'bit': 'бит/сек'
+                });
+                const ioDiv = createGroupingDiv({title: 'Скорость передачи данных:'}, [ioSpeed, ioMetric]);
+                taskCompletingDiv.insertBefore(ioDiv, answerFieldDiv);
+
+                const answerIoSpeed = createInput({type: 'number', class: 'answer-io-speed', width: '40px'});
+                const answerIoMetric = createSelect({class: 'answer-io-metric'}, {
+                    'Kbit': 'Кбит/сек',
+                    'bit': 'бит/сек'
+                });
+                const answerIoDiv = createGroupingDiv({title: 'Новая скорость:'}, [answerIoSpeed, answerIoMetric]);
+                taskCompletingDiv.insertBefore(answerIoDiv, answerFieldDiv);
+
+                const answerMetric = createSelect({class: 'answer-metric'}, {
+                    'Kbyte': 'Кбайт',
+                    'byte': 'байт'
+                });
+                const metricDiv = createGroupingDiv({title: 'Ответ указать в:'}, [answerMetric]);
+                taskCompletingDiv.insertBefore(metricDiv, answerFieldDiv);
+
+                const answerRound = createSelect({class: 'answer-round'}, {
+                    '0': 'До целых',
+                    '1': 'До десятых'
+                });
+                const roundDiv = createGroupingDiv({title: 'Ответ округлить:'}, [answerRound]);
+                taskCompletingDiv.insertBefore(roundDiv, answerFieldDiv);
             },
             'generateAnswer': () => {
-                return '';
+                let fileSize = getValue('.file-size', true);
+                const metric = getValue('.metric', false);
+                let ioSpeed = getValue('.io-speed', true);
+                const ioMetric = getValue('.io-metric', false);
+                let answerIoSpeed = getValue('.answer-io-speed', true);
+                const answerIoMetric = getValue('.answer-io-metric', false);
+                const answerMetric = getValue('.answer-metric', false);
+                const answerRound = getValue('.answer-round', false);
+                if(fileSize === '' || metric === '' || ioSpeed === '' || ioMetric === '' || answerIoSpeed === '' || answerIoMetric === '' ||
+                    answerMetric === '' || answerRound === ''
+                ) return '';
+
+                if(metric === 'Kbyte') fileSize *= 1024*8;
+                else if(metric === 'byte') fileSize *= 8;
+
+                if(ioMetric === 'Kbit') ioSpeed *= 1024;
+                else if(ioMetric === 'bit') ioSpeed = ioSpeed;
+                let time = fileSize / ioSpeed;
+
+                if(answerIoMetric === 'Kbit') answerIoSpeed *= 1024;
+                else if(answerIoMetric === 'bit') answerIoSpeed = answerIoSpeed;
+                let answerFileSize = answerIoSpeed * time;
+
+                if(answerMetric === 'Kbyte') answerFileSize /= 8*1024;
+                else if(answerMetric === 'byte') answerFileSize /= 8;
+
+                if(answerRound === '0') return Math.round(answerFileSize);
+                else if(answerRound === '1') return changeDot(Math.round(answerFileSize * 10) / 10);
             }
         },
 
@@ -720,8 +842,8 @@ const taskFunctional = {
                 const betweenOperator = getValue('.between-operator');
                 const expectedResult = getValue('.true-false', true);
 
-                console.log('Values:', values);
-                console.log('Operators:', { x1x2Operator, x3x4Operator, betweenOperator });
+                //console.log('Values:', values);
+                //console.log('Operators:', { x1x2Operator, x3x4Operator, betweenOperator });
 
                 for(let i = min; i <= max; i++){
                     try{
@@ -742,7 +864,7 @@ const taskFunctional = {
                     }
                 }
 
-                console.log('Найденные числа:', trueNumbers);
+                //console.log('Найденные числа:', trueNumbers);
 
                 const answerType = getValue('.answer-type');
 
@@ -1016,6 +1138,7 @@ const taskFunctional = {
                     if(2**bit >= n) break;
                     if(bit >= 20) return '';
                 }
+
                 let minByte = 0;
                 if(symAmount*bit % 8 !== 0) minByte = Math.ceil(symAmount*bit / 8);
                 else minByte = symAmount*bit / 8;
@@ -1024,7 +1147,7 @@ const taskFunctional = {
                 while(true){
                     addData++;
                     if(users * (minByte + addData) === bytes) return addData;
-                    else if(users * (minByte + addData) > bytes) return '';
+                    else if(users * (minByte + addData) > bytes) return 'Нет решений (проверь введённые значения)';
                 }
             }
         },

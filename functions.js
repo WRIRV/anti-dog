@@ -41,7 +41,17 @@ function getValue(selector, isNumber = false){
     const element = document.querySelector(selector);
     if (!element) return isNumber ? '' : '';
     if(isNumber){
-        if(isNaN(element.value)) return '';
+        if(isNaN(parseInt(element.value))) return '';
+        else return parseInt(element.value);
+    }
+    else return element.value || '';
+}
+
+function getFloatValue(selector, isNumber = false){
+    const element = document.querySelector(selector);
+    if (!element) return isNumber ? '' : '';
+    if(isNumber){
+        if(isNaN(element.value)) return ''; //более щадящая проверка для чисел с отделяющей запятой или точкой
         else return element.value*1;
     }
     else return element.value || '';
